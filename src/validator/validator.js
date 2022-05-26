@@ -11,9 +11,9 @@ const isValidObjectId = function (objectId) {
 }
 
 
-// const isValidRequestBody = function (requestBody) {
-//     return Object.keys(requestBody).length > 0; 
-// };
+const isValidRequestBody = function (requestBody) {
+    return Object.keys(requestBody).length > 0; 
+};
 
 
 
@@ -21,4 +21,4 @@ const validString = function (value) {
     if (typeof value === 'string' && value.trim().length === 0) return false 
     return true;
 }
-module.exports = { isValid, isValidObjectId, validString }
+module.exports = { isValid, isValidObjectId,isValidRequestBody, validString }

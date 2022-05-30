@@ -248,6 +248,7 @@ const updateProduct = async function (req, res) {
     try {
         const updatedData = req.body
         const productId = req.params.productId
+        let files = req.files;
 
 
         if (!validator.isValidObjectId(productId)) {
@@ -261,14 +262,13 @@ const updateProduct = async function (req, res) {
         }
 
         if (!validator.isValidRequestBody(updatedData)) {
-            return res.status(400).send({ status: false, message: "Please Provide Details to Update" })
+            return res.status(400).send({ status: false, message: "Nothing to Update", data:checkProduct })
         }
 
-        const { title, description, price, currencyId, isFreeShipping, style, availableSizes, installments } = requestBody;
-
+        const { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments,productImage } = updatedData
         const updatedProductDetails = {}
 
-        if (validator.validString(title)) {
+        if (!validator.validString(title)) {
             return res.status(400).send({ status: false, message: `Title is required` })
         }
         if (title) {
@@ -282,7 +282,7 @@ const updateProduct = async function (req, res) {
             updatedProductDetails['title'] = title
         }
 
-        if (validator.validString(description)) {
+        if (!validator.validString(description)) {
             return res.status(400).send({ status: false, message: `Description is required` })
         }
 
@@ -290,7 +290,7 @@ const updateProduct = async function (req, res) {
             updatedProductDetails['description'] = description
         }
 
-        if (validator.validString(price)) {
+        if (!validator.validString(price)) {
             return res.status(400).send({ status: false, message: `price is required` })
         }
         if (price) {
@@ -305,19 +305,30 @@ const updateProduct = async function (req, res) {
             updatedProductDetails['price'] = price
         }
 
-        if (validator.validString(currencyId)) {
+        if (!validator.validString(currencyId)) {
             return res.status(400).send({ status: false, message: `currencyId is required` })
         }
 
         if (currencyId) {
-            if (!(currencyId == "INR")) {
+            if (currencyId != "INR") {
                 return res.status(400).send({ status: false, message: 'currencyId should be a INR' })
             }
 
             updatedProductDetails['currencyId'] = currencyId;
         }
 
-        if (validator.validString(isFreeShipping)) {
+        if (!validator.validString(currencyFormat)) {
+            return res.status(400).send({ status: false, message: `currency format is required` })
+        }
+
+        if(currencyFormat){
+            if (currencyFormat != "₹") {
+                return res.status(400).send({ status: false, message: "Please provide currencyFormat in format ₹ only" })
+            }
+            updatedProductDetails['currencyFormat'] = currencySymbol('INR')
+        }
+
+        if (!validator.validString(isFreeShipping)) {
             return res.status(400).send({ status: false, message: `isFreeshiping is required` })
         }
 
@@ -330,21 +341,15 @@ const updateProduct = async function (req, res) {
             updatedProductDetails['isFreeShipping'] = isFreeShipping
         }
 
-        if (validator.validString(productImage)) {
-            return res.status(400).send({ status: false, message: `product image is required` })
-        }
-
         if (productImage) {
-            let productImage = req.files;
-            if ((productImage && productImage.length > 0)) {
-
-                let updatedproductImage = await aws_s3.uploadFile(productImage[0]);
-
-                updatedProductDetails['productImage'] = updatedproductImage
+            if (!(files && files.length > 0)) {
+                res.status(400).send({status:false,msg:"No Image found"})
             }
+            let updatedproductImage = await aws_s3.uploadFile(files[0]);
+            
+            updatedProductDetails['productImage'] = updatedproductImage
         }
-
-        if (validator.validString(style)) {
+        if (!validator.validString(style)) {
             return res.status(400).send({ status: false, message: `style is required` })
         }
         if (style) {
@@ -352,22 +357,21 @@ const updateProduct = async function (req, res) {
             updatedProductDetails['style'] = style
         }
 
-        if (validator.validString(availableSizes)) {
+        if (!validator.validString(availableSizes)) {
             return res.status(400).send({ status: false, message: `size is required` })
         }
        
         if (availableSizes) {
             let sizes = availableSizes.split(",").map(x => x.trim())
             sizes.forEach((size) => {
-             if (["S", "XS", "M", "X", "L", "XXL", "XL"].includes(size)) {
-            updatedProductDetails['availableSizes'] = sizes
-            }
-            return res.status(400).send
-            ({ status: false, msg: `Available sizes must be among ["S", "XS", "M", "X", "L", "XXL", "XL"]` })
-        })    
+                if (!["S", "XS", "M", "X", "L", "XXL", "XL"].includes(size)) {
+                    return res.status(400).send({ status: false, msg: `Available sizes must be among ${["S", "XS", "M", "X", "L", "XXL", "XL"]}` })
+                }
+                updatedProductDetails['availableSizes'] = sizes
+            })
         }
 
-        if (validator.validString(installments)) {
+        if (!validator.validString(installments)) {
             return res.status(400).send({ status: false, message: `installment is required` })
         }
         if (installments) {
@@ -378,7 +382,7 @@ const updateProduct = async function (req, res) {
 
             updatedProductDetails['installments'] = installments
         }
-
+         console.log(updatedProductDetails)
         const updatedProduct = await productModel.findOneAndUpdate(
             { _id: productId },
             updatedProductDetails,

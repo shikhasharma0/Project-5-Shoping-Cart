@@ -15,8 +15,8 @@ const createUser = async function (req, res) {
     let files = req.files;
 
     let userDetails = req.body 
-    
-    if (!Object.keys(userDetails).length) {
+  
+    if(!validator.isValidRequestBody(userDetails)) {
         return res.status(400).send({ status: false, message: "please provide valid user Details" })
     }
 
@@ -212,16 +212,16 @@ const updateUserDetails = async function (req, res) {
         if (!findUserData) {
             return res.status(400).send({ status: false, message: "user not found" })
         }
-
+ 
+        if (findUserData._id.toString() != userIdFromToken) {
+            return res.status(401).send({ status: false, message: "You Are Not Authorized!!" })
+        }
+        
+        let { fname, lname, email, phone, password, address, profileImage } =userDetails
+        
         if (!validator.isValidRequestBody(userDetails)) {
             return res.status(400).send({ status: false, message: "Please provide user's details to update." })
         }
-
-        if (findUserData._id != userIdFromToken) {
-            return res.status(401).send({ status: false, message: "You Are Not Authorized!!" })
-        }
-
-        let { fname, lname, email, phone, password, address, profileImage } =userDetails
 
         if (!validator.validString(fname)) {
         return res.status(400).send({ status: false, message: 'first name is Required' })
@@ -287,63 +287,54 @@ const updateUserDetails = async function (req, res) {
             userDetails.address=userAddress
     
         if(userAddress.shipping){
-            if(userAddress.shipping.street){
+            
             if (!validator.isValid(userAddress.shipping.street)) {
                 return res.status(400).send({ status: false, message: "Please provide address shipping street" });
-            }
-            userDetails.address.shipping.street = userAddress.shipping.street
+            
         }
-            if(userAddress.shipping.city){
+            
             if (!validator.isValid(userAddress.shipping.city)) {
                 return res.status(400).send({ status: false, message: "Please provide address shipping city" });
-            }
-            userDetails.address.shipping.city = userAddress.shipping.city
+           
         }
-            if(userAddress.shipping.pincode){
+            
             if (!validator.isValid(userAddress.shipping.pincode)) {
                 return res.status(400).send({ status: false, message: "Please provide address shipping pincode" });
-            }
-            userDetails.address.shipping.pincode =userAddress.shipping.pincode
+            
         }
         }
 
         if(userAddress.billing){
-            if(userAddress.billing.street){
+            
             if (!validator.isValid(userAddress.billing.street)) {
                 return res.status(400).send({ status: false, message: "Please provide address billing street" });
-            }
-            userDetails.address.billing.street = userAddress.billing.street
+           
         }
-            if(userAddress.billing.city){
+            
             if (!validator.isValid(userAddress.billing.city)) {
                 return res.status(400).send({ status: false, message: "Please provide address billing city" });
-            }
-            userDetails.address.billing.city = userAddress.billing.city
         }
-            if(userAddress.billing.pincode){
+            
             if (!validator.isValid(userAddress.billing.pincode)) {
                 return res.status(400).send({ status: false, message: "Please provide address billing pincode" });
             }
-            userDetails.address.billing.pincode =userAddress.billing.pincode
-        }
+       
         }}
        
        if(profileImage){
-        if (files) {
-            
-                if (!(files && files.length > 0)) 
+        
+                if (!files.length) {
                 return res.status(400).send({ status: false, message: "please provide profile image" })
-                
+                }
                 let userImage = await aws_s3.uploadFile(files[0])
                 userDetails.profileImage=userImage
-            }
+            
         }
 
-        console.log(userDetails)
 
         let updateProfileDetails = await userModel.findOneAndUpdate(
             { _id: userId },
-             {$set: userDetails}, 
+             userDetails, 
              { new: true })
 
         return res.status(200).send({ status: true, msg:"User Update Successful!!",data: updateProfileDetails })
@@ -359,9 +350,3 @@ const updateUserDetails = async function (req, res) {
 module.exports = { createUser, userLogin, getUserDetails, updateUserDetails }
 
 
-
-// "billing": {
-//     "street": "MG Road",
-//     "city": "Indore",
-//     "pincode": 452001
-// }

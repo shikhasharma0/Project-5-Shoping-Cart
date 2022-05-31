@@ -60,11 +60,11 @@ const productCreation = async function (req, res) {
             return res.status(400).send({ status: false, message: "style is required" })
         }
 
-      
+
         if (!validator.validString(installments)) {
             return res.status(400).send({ status: false, message: "installments required" })
         }
-        
+
 
         if (installments) {
             if (!Number.isInteger(Number(installments))) {
@@ -119,40 +119,40 @@ const productCreation = async function (req, res) {
 
 const getAllProducts = async function (req, res) {
     //try {
-        const inputs = req.query;
-        
-        let filterData={}
-        filterData.isDeleted = false
-        
+    const inputs = req.query;
 
-        if (!validator.validString(inputs.size)) {
-            return res.status(400).send({ status: false, msg: "Please Provide a Valid Size!" })
-        }
-        if (inputs.size) {
-            filterData['availableSizes'] = inputs.size
-        }
+    let filterData = {}
+    filterData.isDeleted = false
 
-        if (!validator.validString(inputs.name)) {
-            return res.status(400).send({ status: false, msg: "Please Provide a Name Of the Product!" })
-        }
-        
-        if (inputs.name) {
-            filterData['title'] = {}
-            filterData['title']['$regex'] = inputs.name //$regex to match the subString
-            filterData['title']['$options'] = 'i'  //"i" for case insensitive.
-            
-        }
 
-        if (!validator.validString(inputs.priceGreaterThan)) {
-            return res.status(400).send({ status: false, msg: "Please Provide a Lowest Price Of the Product!" })
-        }
-        if (!validator.validString(inputs.priceLessThan)) {
-            return res.status(400).send({ status: false, msg: "Please Provide a Highest Price Of the Product!" })
-        }
-        if (inputs.priceGreaterThan ||inputs.priceLessThan){
-            
-        filterData.price={}
-        
+    if (!validator.validString(inputs.size)) {
+        return res.status(400).send({ status: false, msg: "Please Provide a Valid Size!" })
+    }
+    if (inputs.size) {
+        filterData['availableSizes'] = inputs.size
+    }
+
+    if (!validator.validString(inputs.name)) {
+        return res.status(400).send({ status: false, msg: "Please Provide a Name Of the Product!" })
+    }
+
+    if (inputs.name) {
+        filterData['title'] = {}
+        filterData['title']['$regex'] = inputs.name //$regex to match the subString
+        filterData['title']['$options'] = 'i'  //"i" for case insensitive.
+
+    }
+
+    if (!validator.validString(inputs.priceGreaterThan)) {
+        return res.status(400).send({ status: false, msg: "Please Provide a Lowest Price Of the Product!" })
+    }
+    if (!validator.validString(inputs.priceLessThan)) {
+        return res.status(400).send({ status: false, msg: "Please Provide a Highest Price Of the Product!" })
+    }
+    if (inputs.priceGreaterThan || inputs.priceLessThan) {
+
+        filterData.price = {}
+
         if (inputs.priceGreaterThan) {
 
             if (isNaN(Number(inputs.priceGreaterThan))) {
@@ -161,7 +161,7 @@ const getAllProducts = async function (req, res) {
             if (inputs.priceGreaterThan <= 0) {
                 return res.status(400).send({ status: false, message: `priceGreaterThan shouldn't be 0 or-ve number` })
             }
-          
+
             filterData['price']['$gte'] = Number(inputs.priceGreaterThan)
 
         }
@@ -175,41 +175,41 @@ const getAllProducts = async function (req, res) {
             if (inputs.priceLessThan <= 0) {
                 return res.status(400).send({ status: false, message: `priceLessThan can't be 0 or -ve` })
             }
-            
+
             filterData['price']['$lte'] = Number(inputs.priceLessThan)
 
         }
     }
 
-        if (!validator.validString(inputs.priceSort)) {
-            return res.status(400).send({ status: false, msg: "Please Sort 1 for Ascending -1 for Descending order!" })
+    if (!validator.validString(inputs.priceSort)) {
+        return res.status(400).send({ status: false, msg: "Please Sort 1 for Ascending -1 for Descending order!" })
+    }
+
+    if (inputs.priceSort) {
+
+        if (!((inputs.priceSort == 1) || (inputs.priceSort == -1))) {
+            return res.status(400).send({ status: false, message: `priceSort should be 1 or -1 ` })
         }
 
-        if (inputs.priceSort) {
-
-            if (!((inputs.priceSort == 1) || (inputs.priceSort == -1))) {
-                return res.status(400).send({ status: false, message: `priceSort should be 1 or -1 ` })
-            }
-
-            const products = await productModel.find(filterData).sort({ price: inputs.priceSort })
-
-            if (!products.length) {
-                return res.status(404).send({ productStatus: false, message: 'No Product found' })
-            }
-
-            return res.status(200).send({ status: true, message: 'Product list', data2: products })
-        }
-
-
-        const products = await productModel.find(filterData)
+        const products = await productModel.find(filterData).sort({ price: inputs.priceSort })
 
         if (!products.length) {
             return res.status(404).send({ productStatus: false, message: 'No Product found' })
         }
 
-        return res.status(200).send({ status: true, message: 'Product list', data: products })
+        return res.status(200).send({ status: true, message: 'Product list', data2: products })
+    }
 
-    
+
+    const products = await productModel.find(filterData)
+
+    if (!products.length) {
+        return res.status(404).send({ productStatus: false, message: 'No Product found' })
+    }
+
+    return res.status(200).send({ status: true, message: 'Product list', data: products })
+
+
     // } catch (err) {
     //     return res.status(500).send({ status: false, error: err.message });
     // }
@@ -262,10 +262,10 @@ const updateProduct = async function (req, res) {
         }
 
         if (!validator.isValidRequestBody(updatedData)) {
-            return res.status(400).send({ status: false, message: "Nothing to Update", data:checkProduct })
+            return res.status(400).send({ status: false, message: "please provide product details to update" })
         }
 
-        const { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments,productImage } = updatedData
+        const { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments, productImage } = updatedData
         const updatedProductDetails = {}
 
         if (!validator.validString(title)) {
@@ -321,7 +321,7 @@ const updateProduct = async function (req, res) {
             return res.status(400).send({ status: false, message: `currency format is required` })
         }
 
-        if(currencyFormat){
+        if (currencyFormat) {
             if (currencyFormat != "₹") {
                 return res.status(400).send({ status: false, message: "Please provide currencyFormat in format ₹ only" })
             }
@@ -341,17 +341,17 @@ const updateProduct = async function (req, res) {
             updatedProductDetails['isFreeShipping'] = isFreeShipping
         }
 
-        if (productImage) {
-            if (!(files && files.length > 0)) {
-                res.status(400).send({status:false,msg:"No Image found"})
-            }
-            let updatedproductImage = await aws_s3.uploadFile(files[0]);
-            
-            updatedProductDetails['productImage'] = updatedproductImage
+        if (!files.length) {
+            return res.status(400).send({ status: false, message: "Please provide product image" })
         }
+
+        let updatedproductImage = await aws_s3.uploadFile(files[0]);
+        updatedProductDetails.productImage = updatedproductImage
+
         if (!validator.validString(style)) {
             return res.status(400).send({ status: false, message: `style is required` })
         }
+
         if (style) {
 
             updatedProductDetails['style'] = style
@@ -360,7 +360,7 @@ const updateProduct = async function (req, res) {
         if (!validator.validString(availableSizes)) {
             return res.status(400).send({ status: false, message: `size is required` })
         }
-       
+
         if (availableSizes) {
             let sizes = availableSizes.split(",").map(x => x.trim())
             sizes.forEach((size) => {
@@ -382,7 +382,7 @@ const updateProduct = async function (req, res) {
 
             updatedProductDetails['installments'] = installments
         }
-         console.log(updatedProductDetails)
+
         const updatedProduct = await productModel.findOneAndUpdate(
             { _id: productId },
             updatedProductDetails,

@@ -118,101 +118,101 @@ const productCreation = async function (req, res) {
 /************************************************************Get All Product********************************************/
 
 const getAllProducts = async function (req, res) {
-    //try {
-    const inputs = req.query;
+    try {
+        const inputs = req.query;
 
-    let filterData = {}
-    filterData.isDeleted = false
+        let filterData = {}
+        filterData.isDeleted = false
 
 
-    if (!validator.validString(inputs.size)) {
-        return res.status(400).send({ status: false, msg: "Please Provide a Valid Size!" })
-    }
-    if (inputs.size) {
-        filterData['availableSizes'] = inputs.size
-    }
+        if (!validator.validString(inputs.size)) {
+            return res.status(400).send({ status: false, msg: "Please Provide a Valid Size!" })
+        }
+        if (inputs.size) {
+            filterData['availableSizes'] = inputs.size
+        }
 
-    if (!validator.validString(inputs.name)) {
-        return res.status(400).send({ status: false, msg: "Please Provide a Name Of the Product!" })
-    }
+        if (!validator.validString(inputs.name)) {
+            return res.status(400).send({ status: false, msg: "Please Provide a Name Of the Product!" })
+        }
 
-    if (inputs.name) {
-        filterData['title'] = {}
-        filterData['title']['$regex'] = inputs.name //$regex to match the subString
-        filterData['title']['$options'] = 'i'  //"i" for case insensitive.
-
-    }
-
-    if (!validator.validString(inputs.priceGreaterThan)) {
-        return res.status(400).send({ status: false, msg: "Please Provide a Lowest Price Of the Product!" })
-    }
-    if (!validator.validString(inputs.priceLessThan)) {
-        return res.status(400).send({ status: false, msg: "Please Provide a Highest Price Of the Product!" })
-    }
-    if (inputs.priceGreaterThan || inputs.priceLessThan) {
-
-        filterData.price = {}
-
-        if (inputs.priceGreaterThan) {
-
-            if (isNaN(Number(inputs.priceGreaterThan))) {
-                return res.status(400).send({ status: false, message: `priceGreaterThan should be a valid number` })
-            }
-            if (inputs.priceGreaterThan <= 0) {
-                return res.status(400).send({ status: false, message: `priceGreaterThan shouldn't be 0 or-ve number` })
-            }
-
-            filterData['price']['$gte'] = Number(inputs.priceGreaterThan)
+        if (inputs.name) {
+            filterData['title'] = {}
+            filterData['title']['$regex'] = inputs.name //$regex to match the subString
+            filterData['title']['$options'] = 'i'  //"i" for case insensitive.
 
         }
 
-
-        if (inputs.priceLessThan) {
-
-            if (isNaN(Number(inputs.priceLessThan))) {
-                return res.status(400).send({ status: false, message: `priceLessThan should be a valid number` })
-            }
-            if (inputs.priceLessThan <= 0) {
-                return res.status(400).send({ status: false, message: `priceLessThan can't be 0 or -ve` })
-            }
-
-            filterData['price']['$lte'] = Number(inputs.priceLessThan)
-
+        if (!validator.validString(inputs.priceGreaterThan)) {
+            return res.status(400).send({ status: false, msg: "Please Provide a Lowest Price Of the Product!" })
         }
-    }
+        if (!validator.validString(inputs.priceLessThan)) {
+            return res.status(400).send({ status: false, msg: "Please Provide a Highest Price Of the Product!" })
+        }
+        if (inputs.priceGreaterThan || inputs.priceLessThan) {
 
-    if (!validator.validString(inputs.priceSort)) {
-        return res.status(400).send({ status: false, msg: "Please Sort 1 for Ascending -1 for Descending order!" })
-    }
+            filterData.price = {}
 
-    if (inputs.priceSort) {
+            if (inputs.priceGreaterThan) {
 
-        if (!((inputs.priceSort == 1) || (inputs.priceSort == -1))) {
-            return res.status(400).send({ status: false, message: `priceSort should be 1 or -1 ` })
+                if (isNaN(Number(inputs.priceGreaterThan))) {
+                    return res.status(400).send({ status: false, message: `priceGreaterThan should be a valid number` })
+                }
+                if (inputs.priceGreaterThan <= 0) {
+                    return res.status(400).send({ status: false, message: `priceGreaterThan shouldn't be 0 or-ve number` })
+                }
+
+                filterData['price']['$gte'] = Number(inputs.priceGreaterThan)
+
+            }
+
+
+            if (inputs.priceLessThan) {
+
+                if (isNaN(Number(inputs.priceLessThan))) {
+                    return res.status(400).send({ status: false, message: `priceLessThan should be a valid number` })
+                }
+                if (inputs.priceLessThan <= 0) {
+                    return res.status(400).send({ status: false, message: `priceLessThan can't be 0 or -ve` })
+                }
+
+                filterData['price']['$lte'] = Number(inputs.priceLessThan)
+
+            }
         }
 
-        const products = await productModel.find(filterData).sort({ price: inputs.priceSort })
+        if (!validator.validString(inputs.priceSort)) {
+            return res.status(400).send({ status: false, msg: "Please Sort 1 for Ascending -1 for Descending order!" })
+        }
+
+        if (inputs.priceSort) {
+
+            if (!((inputs.priceSort == 1) || (inputs.priceSort == -1))) {
+                return res.status(400).send({ status: false, message: `priceSort should be 1 or -1 ` })
+            }
+
+            const products = await productModel.find(filterData).sort({ price: inputs.priceSort })
+
+            if (!products.length) {
+                return res.status(404).send({ productStatus: false, message: 'No Product found' })
+            }
+
+            return res.status(200).send({ status: true, message: 'Product list', data2: products })
+        }
+
+
+        const products = await productModel.find(filterData)
 
         if (!products.length) {
             return res.status(404).send({ productStatus: false, message: 'No Product found' })
         }
 
-        return res.status(200).send({ status: true, message: 'Product list', data2: products })
+        return res.status(200).send({ status: true, message: 'Product list', data: products })
+
+
+    } catch (err) {
+        return res.status(500).send({ status: false, error: err.message });
     }
-
-
-    const products = await productModel.find(filterData)
-
-    if (!products.length) {
-        return res.status(404).send({ productStatus: false, message: 'No Product found' })
-    }
-
-    return res.status(200).send({ status: true, message: 'Product list', data: products })
-
-
-    // } catch (err) {
-    //     return res.status(500).send({ status: false, error: err.message });
-    // }
 }
 
 /***********************************************************Get Product By Id*******************************************/
@@ -266,6 +266,7 @@ const updateProduct = async function (req, res) {
         }
 
         const { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments, productImage } = updatedData
+
         const updatedProductDetails = {}
 
         if (!validator.validString(title)) {

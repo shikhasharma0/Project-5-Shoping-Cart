@@ -114,13 +114,13 @@ const updateOrder = async (req, res) => {
             return res.status(400).send({ status: 'false', msg: "user not found" })
         }
 
-         if (checkUser._id.toString() != tokenUserId) {
+        if (checkUser._id.toString() != tokenUserId) {
             res.status(401).send({ status: false, message: "You Are Not Authorized" });
             return
         }
-        
+
         const { orderId, status } = updateData;
-        
+
         if (!validator.isValidRequestBody(updateData)) {
             return res.status(400).send({ status: false, message: "please provide data to Update" })
         }
@@ -147,10 +147,10 @@ const updateOrder = async (req, res) => {
                 return res.status(400).send({ status: false, message: `Status must be among ['pending','completed','cancelled'].`, });
             }
         }
-     
+
         if (checkOrder.cancellable == true) {
 
-            if(checkOrder.status==status){
+            if (checkOrder.status == status) {
                 return res.status(200).send({ status: false, message: `Order status is alreday ${status}` })
             }
 

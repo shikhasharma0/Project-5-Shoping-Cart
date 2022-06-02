@@ -122,7 +122,8 @@ const getAllProducts = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Please Provide a Valid Size!" })
         }
         if (inputs.size) {
-            filterData['availableSizes'] = inputs.size
+            let sizes = inputs.size.split(",").map(x => x.trim())
+            filterData['availableSizes'] = sizes
         }
 
         if (!validator.validString(inputs.name)) {

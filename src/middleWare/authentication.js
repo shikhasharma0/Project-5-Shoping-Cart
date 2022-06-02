@@ -8,7 +8,7 @@ const userAuthentication = async function(req, res, next){
         const token = req.headers.authorization
 
         if (!token) {
-        return res.status(403).send({ status: false, message: `Token Not Found` })}
+        return res.status(400).send({ status: false, message: `Token Not Found` })}
             
         let splitToken = token.split(' ')
 

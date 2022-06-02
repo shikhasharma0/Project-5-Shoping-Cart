@@ -21,7 +21,7 @@ const createOrder = async function (req, res) {
 
         let checkUser = await userModel.findById(userId)
         if (!checkUser) {
-            return res.status(400).send({ status: 'false', msg: "user not found" })
+            return res.status(404).send({ status: 'false', msg: "user not found" })
         }
 
         if (checkUser._id.toString() != tokenUserId) {
@@ -45,7 +45,7 @@ const createOrder = async function (req, res) {
 
         let checkCart = await cartModel.findOne({ userId: userId, _id: cartId })
         if (!checkCart) {
-            return res.status(400).send({ status: 'false', msg: "cart not found" })
+            return res.status(404).send({ status: 'false', msg: "cart not found" })
         }
 
         if (!validator.validString(cancellable)) {
@@ -111,7 +111,7 @@ const updateOrder = async (req, res) => {
 
         let checkUser = await userModel.findById(userId)
         if (!checkUser) {
-            return res.status(400).send({ status: 'false', msg: "user not found" })
+            return res.status(404).send({ status: 'false', msg: "user not found" })
         }
 
         if (checkUser._id.toString() != tokenUserId) {
@@ -135,7 +135,7 @@ const updateOrder = async (req, res) => {
 
         let checkOrder = await orderModel.findOne({ _id: orderId, userId: userId })
         if (!checkOrder) {
-            return res.status(400).send({ status: 'false', msg: "order not found" })
+            return res.status(404).send({ status: 'false', msg: "order not found" })
         }
 
         if (!validator.isValid(status)) {

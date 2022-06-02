@@ -217,7 +217,7 @@ const updateUserDetails = async function (req, res) {
             return res.status(401).send({ status: false, message: "You Are Not Authorized!!" })
         }
 
-        let { fname, lname, email, phone, password, address,} = userDetails
+        let { fname, lname, email, phone, password, address,profileImage} = userDetails
 
         
         if (!validator.isValidRequestBody(userDetails)) {
@@ -331,13 +331,15 @@ const updateUserDetails = async function (req, res) {
                 }
             }
         }
+        if(profileImage){
         if (!files.length) {
             return res.status(400).send({ status: false, message: "please provide profile image" })
         }
+        var userImage = await aws_s3.uploadFile(files[0])
+    }
         
-        let userImage = await aws_s3.uploadFile(files[0])
         
-        
+    
         let updatedData={
             fname:fname,
             lname:lname,

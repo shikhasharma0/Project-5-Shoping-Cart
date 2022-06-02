@@ -47,14 +47,7 @@ const productCreation = async function (req, res) {
             return res.status(400).send({ status: false, message: "currencyId should be INR" })
         }
 
-        if (!validator.isValid(currencyFormat)) {
-            return res.status(400).send({ status: false, message: "currency fromat is required" })
-        }
-
-        if (currencyFormat != "₹") {
-            return res.status(400).send({ status: false, message: "Please provide currencyFormat in format ₹ only" })
-        }
-        productDetails.currencyFormat = currencySymbol('INR')
+        productDetails.currencyFormat = currencySymbol(currencyId)
 
         if (!validator.validString(style)) {
             return res.status(400).send({ status: false, message: "style is required" })
@@ -342,12 +335,15 @@ const updateProduct = async function (req, res) {
             updatedProductDetails['isFreeShipping'] = isFreeShipping
         }
 
-        if (!files.length) {
-            return res.status(400).send({ status: false, message: "Please provide product image" })
-        }
+        if (productImage) {
 
-        let updatedproductImage = await aws_s3.uploadFile(files[0]);
-        updatedProductDetails.productImage = updatedproductImage
+            if (!files.length) {
+                return res.status(400).send({ status: false, message: "Please provide product image" })
+            }
+
+            let updatedproductImage = await aws_s3.uploadFile(files[0]);
+            updatedProductDetails.productImage = updatedproductImage
+        }
 
         if (!validator.validString(style)) {
             return res.status(400).send({ status: false, message: `style is required` })

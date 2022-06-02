@@ -286,7 +286,7 @@ const deleteCart = async function (req, res) {
                 return res.status(400).send({ status: false, message: "user not found" })
             }
 
-            if (findUser._id.toString() != userIdFromToken) {
+            if (checkUser._id.toString() != userIdFromToken) {
                 return res.status(401).send({ status: false, message: `You are Not Authorized` });
             }
 

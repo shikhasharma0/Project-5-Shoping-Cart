@@ -72,6 +72,10 @@ const createUser = async function (req, res) {
 
         let userAddress = JSON.parse(userDetails.address)
         userDetails.address = userAddress
+        
+        if (!validator.isValid(userAddress.shipping && userAddress.billing)) { 
+            return res.status(400).send({ status: false, message: "Please provide Address shipping And Billing Address" });
+        }
 
         if (!validator.isValid(userAddress.shipping.street)) {
             return res.status(400).send({ status: false, message: "Please provide address shipping street" });
@@ -79,7 +83,7 @@ const createUser = async function (req, res) {
         if (!validator.isValid(userAddress.shipping.city)) {
             return res.status(400).send({ status: false, message: "Please provide address shipping city" });
         }
-        if (!(validator.isValid(userAddress.shipping.pincode)&&Number.isInteger(Number(userAddress.billing.street)))) {
+        if (!(validator.isValid(userAddress.shipping.pincode)&&Number.isInteger(Number(userAddress.shipping.pincode)))) {
             return res.status(400).send({ status: false, message: "Please provide valid address shipping pincode" });
         }
         if (!validator.isValid(userAddress.billing.street)) {
@@ -88,7 +92,7 @@ const createUser = async function (req, res) {
         if (!validator.isValid(userAddress.billing.city)) {
             return res.status(400).send({ status: false, message: "Please provide address billing city" });
         }
-        if (!(validator.isValid(userAddress.billing.pincode)&&Number.isInteger(Number(userAddress.billing.street)))) {
+        if (!(validator.isValid(userAddress.billing.pincode)&&Number.isInteger(Number(userAddress.billing.pincode)))) {
             return res.status(400).send({ status: false, message: "Please provide valid address billing pincode" });
         }
 
@@ -138,7 +142,7 @@ const userLogin = async function (req, res) {
         const userData = await userModel.findOne({ email });
 
         if (!userData) {
-            return res.status(404).send({ status: false, message: `Login failed!! Email-Id is incorrect!` });
+            return res.status(401).send({ status: false, message: `Login failed!! Email-Id is incorrect!` });
         }
 
         const checkPassword = await bcrypt.compare(password, userData.password)
@@ -332,12 +336,10 @@ const updateUserDetails = async function (req, res) {
                 }
             }
         }
-        if(profileImage){
-        if (!files.length) {
-            return res.status(400).send({ status: false, message: "please provide profile image" })
+        
+        if (files&&files.length) {
+            var userImage = await aws_s3.uploadFile(files[0])
         }
-        var userImage = await aws_s3.uploadFile(files[0])
-    }
         
         
     

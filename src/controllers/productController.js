@@ -336,14 +336,11 @@ const updateProduct = async function (req, res) {
             updatedProductDetails['isFreeShipping'] = isFreeShipping
         }
 
-        if (productImage) {
-
-            if (!files.length) {
-                return res.status(400).send({ status: false, message: "Please provide product image" })
-            }
+        if (files && files.length) {
 
             let updatedproductImage = await aws_s3.uploadFile(files[0]);
             updatedProductDetails.productImage = updatedproductImage
+
         }
 
         if (!validator.validString(style)) {

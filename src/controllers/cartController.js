@@ -24,7 +24,7 @@ const addToCart = async function (req, res) {
         }
 
         if (checkUser._id.toString() != tokenUserId) {
-            res.status(401).send({ status: false, message: "You Are Not Authorized" });
+            res.status(403).send({ status: false, message: "You Are Not Authorized" });
             return
         }
 
@@ -144,7 +144,7 @@ const updateCart = async function (req, res) {
         }
 
         if (checkUser._id.toString() != tokenUserId) {
-            res.status(401).send({ status: false, message: "You Are Not Authorized" });
+            res.status(403).send({ status: false, message: "You Are Not Authorized" });
             return
         }
 
@@ -251,7 +251,7 @@ const getCart = async function (req, res) {
         }
 
         if (checkUser._id.toString() != tokenUserId) {
-            res.status(401).send({ status: false, message: "You Are Not Authorized" });
+            res.status(403).send({ status: false, message: "You Are Not Authorized" });
             return
         }
 
@@ -285,7 +285,7 @@ const deleteCart = async function (req, res) {
         }
 
         if (checkUser._id.toString() != userIdFromToken) {
-            return res.status(401).send({ status: false, message: `You are Not Authorized` });
+            return res.status(403).send({ status: false, message: `You are Not Authorized` });
         }
 
         const findCart = await cartModel.findOne({ userId })

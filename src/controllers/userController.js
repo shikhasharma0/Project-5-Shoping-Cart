@@ -186,7 +186,7 @@ const getUserDetails = async function (req, res) {
         }
 
         if (findUserDetails._id.toString() != userIdFromToken) {
-            return res.status(401).send({ status: false, message: "You Are Not Authorized!!" });
+            return res.status(403).send({ status: false, message: "You Are Not Authorized!!" });
         }
 
         return res.status(200).send({ status: true, message: "Profile Fetched Successfully!!", data: findUserDetails })
@@ -219,7 +219,7 @@ const updateUserDetails = async function (req, res) {
         }
 
         if (findUserData._id.toString() != userIdFromToken) {
-            return res.status(401).send({ status: false, message: "You Are Not Authorized!!" })
+            return res.status(403).send({ status: false, message: "You Are Not Authorized!!" })
         }
 
         let { fname, lname, email, phone, password, address,profileImage} = userDetails

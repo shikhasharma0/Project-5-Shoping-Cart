@@ -16,7 +16,7 @@ const userAuthentication = async function(req, res, next){
     
         if (!decodeToken) {
 
-        return res.status(403).send({ status: false, message: `Invalid Token` })}
+        return res.status(401).send({ status: false, message: `Invalid Token` })}
 
         req.userId = decodeToken.userId
 

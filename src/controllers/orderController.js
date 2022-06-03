@@ -25,7 +25,7 @@ const createOrder = async function (req, res) {
         }
 
         if (checkUser._id.toString() != tokenUserId) {
-            res.status(401).send({ status: false, message: "You Are Not Authorized" });
+            res.status(403).send({ status: false, message: "You Are Not Authorized" });
             return
         }
 
@@ -115,7 +115,7 @@ const updateOrder = async (req, res) => {
         }
 
         if (checkUser._id.toString() != tokenUserId) {
-            res.status(401).send({ status: false, message: "You Are Not Authorized" });
+            res.status(403).send({ status: false, message: "You Are Not Authorized" });
             return
         }
 

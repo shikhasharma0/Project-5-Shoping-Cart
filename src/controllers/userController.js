@@ -19,11 +19,11 @@ const createUser = async function (req, res) {
         if (!validator.isValidRequestBody(userDetails)) {
             return res.status(400).send({ status: false, message: "please provide valid user Details" })
         }
-
+        
         if (!validator.isValid(userDetails.fname)) {
             return res.status(400).send({ status: false, message: "first name is required" })
         }
-
+   
         if (!validator.isValid(userDetails.lname)) {
             return res.status(400).send({ status: false, message: "last name is required" })
         }

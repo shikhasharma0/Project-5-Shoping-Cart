@@ -444,13 +444,7 @@ Refer below sample
 {
   "_id": ObjectId("88abc190ef0288abc190ef88"),
   userId: ObjectId("88abc190ef0288abc190ef02"),
-  items: [{
-    productId: ObjectId("88abc190ef0288abc190ef55"),
-    quantity: 2
-  }, {
-    productId: ObjectId("88abc190ef0288abc190ef60"),
-    quantity: 1
-  }],
+*-*
   totalPrice: 50.99,
   totalItems: 2,
   createdAt: "2021-09-17T04:25:07.803Z",
